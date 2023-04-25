@@ -1,0 +1,201 @@
+@import url("https://fonts.googleapis.com/css?family=Droid+Sans+Mono");
+@font-face {
+  font-family: "Tenada";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-2@1.0/Tenada.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.today {
+  margin-top: 1.5vw;
+  font-size: 1.4vw;
+  font-family: "Tenada";
+  color: rgb(49, 49, 49);
+  text-shadow: 0 0 0.7em rgba(255, 183, 119, 0.676),
+    0 0 0.7em rgba(255, 183, 119, 0.676), 0 0 0.7em rgba(255, 183, 119, 0.676);
+  text-align: center;
+}
+
+.flipClock {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  width: 13vw;
+  margin: 5px auto;
+}
+
+.flipUnitContainer {
+  display: block;
+  position: relative;
+  min-width: 4vw;
+  height: 5vw;
+  -webkit-perspective-origin: 50% 50%;
+  perspective-origin: 50% 50%;
+  -webkit-perspective: 300px;
+  perspective: 300px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 3px;
+  box-shadow: 0px 10px 10px -10px rgb(255, 162, 0);
+}
+
+.upperCard,
+.lowerCard {
+  display: -webkit-box;
+  display: flex;
+  position: relative;
+  -webkit-box-pack: center;
+  justify-content: center;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  border: 1px solid whitesmoke;
+}
+.upperCard span,
+.lowerCard span {
+  font-size: 2.5vw;
+  font-family: "Droid Sans Mono", monospace;
+  font-weight: bold;
+  color: #333333;
+}
+
+.upperCard {
+  -webkit-box-align: end;
+  align-items: flex-end;
+  border-bottom: 0.5px solid whitesmoke;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+.upperCard span {
+  -webkit-transform: translateY(50%);
+  transform: translateY(50%);
+}
+
+.lowerCard {
+  -webkit-box-align: start;
+  align-items: flex-start;
+  border-top: 0.5px solid whitesmoke;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.lowerCard span {
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.flipCard {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.flipCard span {
+  font-family: "Droid Sans Mono", monospace;
+  font-size: 2.5vw;
+  font-weight: bold;
+  color: #333333;
+}
+.flipCard.unfold {
+  top: 50%;
+  -webkit-box-align: start;
+  align-items: flex-start;
+  -webkit-transform-origin: 50% 0%;
+  transform-origin: 50% 0%;
+  -webkit-transform: rotateX(180deg);
+  transform: rotateX(180deg);
+  background-color: white;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border: 0.5px solid whitesmoke;
+  border-top: 0.5px solid whitesmoke;
+}
+.flipCard.unfold span {
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.flipCard.fold {
+  top: 0%;
+  -webkit-box-align: end;
+  align-items: flex-end;
+  -webkit-transform-origin: 50% 100%;
+  transform-origin: 50% 100%;
+  -webkit-transform: rotateX(0deg);
+  transform: rotateX(0deg);
+  background-color: white;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border: 0.5px solid whitesmoke;
+  border-bottom: 0.5px solid whitesmoke;
+}
+.flipCard.fold span {
+  -webkit-transform: translateY(50%);
+  transform: translateY(50%);
+}
+
+.fold {
+  -webkit-animation: fold 0.6s cubic-bezier(0.455, 0.03, 0.515, 0.955) 0s 1
+    normal forwards;
+  animation: fold 0.6s cubic-bezier(0.455, 0.03, 0.515, 0.955) 0s 1 normal
+    forwards;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.unfold {
+  -webkit-animation: unfold 0.6s cubic-bezier(0.455, 0.03, 0.515, 0.955) 0s 1
+    normal forwards;
+  animation: unfold 0.6s cubic-bezier(0.455, 0.03, 0.515, 0.955) 0s 1 normal
+    forwards;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+@-webkit-keyframes fold {
+  0% {
+    -webkit-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+  }
+  100% {
+    -webkit-transform: rotateX(-180deg);
+    transform: rotateX(-180deg);
+  }
+}
+
+@keyframes fold {
+  0% {
+    -webkit-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+  }
+  100% {
+    -webkit-transform: rotateX(-180deg);
+    transform: rotateX(-180deg);
+  }
+}
+@-webkit-keyframes unfold {
+  0% {
+    -webkit-transform: rotateX(180deg);
+    transform: rotateX(180deg);
+  }
+  100% {
+    -webkit-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+  }
+}
+@keyframes unfold {
+  0% {
+    -webkit-transform: rotateX(180deg);
+    transform: rotateX(180deg);
+  }
+  100% {
+    -webkit-transform: rotateX(0deg);
+    transform: rotateX(0deg);
+  }
+}

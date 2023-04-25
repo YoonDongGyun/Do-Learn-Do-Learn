@@ -1,0 +1,175 @@
+buildscript {
+	ext {
+		springBootVer = '2.7.7'
+		springDependencyMgmtVer = '1.1.0'
+		querydslVer = '5.0.0'
+		querydslPluginVer = '1.0.10'
+		jwtVer = '0.11.5'
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version "${springBootVer}"
+	id 'io.spring.dependency-management' version "${springDependencyMgmtVer}"
+
+	//Query dsl 을 프로젝트로 설정할 때 gradle이 5.0 이상일 때 추가 작업
+	id "com.ewerk.gradle.plugins.querydsl" version "${querydslPluginVer}"
+	id 'jacoco'
+	id "org.sonarqube" version "3.0"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.3'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-oauth2-client
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.7.5'
+
+	// spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	//querydsl
+	implementation "com.querydsl:querydsl-jpa:${querydslVer}"
+	implementation "com.querydsl:querydsl-apt:${querydslVer}"
+
+	//jwt
+	implementation "io.jsonwebtoken:jjwt-api:${jwtVer}"
+	implementation "io.jsonwebtoken:jjwt-jackson:${jwtVer}"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwtVer}"
+
+	// websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// https://mvnrepository.com/artifact/org.webjars/sockjs-client
+	implementation group: 'org.webjars', name: 'sockjs-client', version: '1.0.2'
+	// https://mvnrepository.com/artifact/org.webjars/stomp-websocket
+	implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.3'
+
+	// file upload
+	implementation 'commons-io:commons-io:2.6'
+	implementation 'commons-fileupload:commons-fileupload:1.4'
+
+	// test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	testRuntimeOnly 'com.h2database:h2'
+}
+
+// querydsl 사용할 경로 지정합니다. 현재 지정한 부분은 .gitignore에 포함되므로 git에 올라가지 않습니다.
+def querydslDir = "$buildDir/generated/'querydsl'"
+
+// JPA 사용여부 및 사용 경로 설정
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+// build시 사용할 sourceSet 추가 설정
+sourceSets {
+	main.java.srcDir querydslDir
+}
+
+
+// querydsl 컴파일 시 사용할 옵션 설정
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+// querydsl이 compileClassPath를 상속하도록 설정
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+
+test {
+	// finalizedBy : 이(test) 작업에 대해 주어진 종료자 작업을 추가
+	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport' // test 작업이 끝나고 jacocoTestReport를 실행
+}
+
+jacoco {
+	toolVersion = "0.8.7"
+}
+
+
+jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.required = true
+	}
+
+	def Qdomains = []
+	for(qPattern in "**/QA" .. "**/QZ"){
+		Qdomains.add(qPattern+"*")
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it,
+					exclude: [] + Qdomains)
+		}))
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+
+	def Qdomains = []
+	// 패키지 + 클래스명
+	for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
+		Qdomains.add(qPattern + '*')
+	}
+
+	violationRules {
+		rule {
+			enabled = true // 활성화
+			element = 'CLASS' // 클래스 단위로 커버리지 체크
+			// includes = []
+
+			// 라인 커버리지 제한을 80%로 설정
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.00
+			}
+
+			// 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한합니다.
+			limit {
+				counter = 'LINE'
+				value = 'TOTALCOUNT'
+				maximum = 200
+			}
+
+			excludes = [] + Qdomains // 제외할 Qdomains 패턴 추가
+		}
+
+	}
+}
+
